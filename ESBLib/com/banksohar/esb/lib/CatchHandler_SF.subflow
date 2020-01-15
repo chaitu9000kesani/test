@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ComIbmCompute.msgnode="ComIbmCompute.msgnode" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:eflow="http://www.ibm.com/wbi/2005/eflow" xmlns:utility="http://www.ibm.com/wbi/2005/eflow_utility" nsURI="com/banksohar/esb/lib/CatchHandler_SF.subflow" nsPrefix="com_banksohar_esb_lib_CatchHandler_SF.subflow">
+  <eClassifiers xmi:type="eflow:FCMComposite" name="FCMComposite_1" useDefaults="true" udpSupport="true">
+    <eSuperTypes href="http://www.ibm.com/wbi/2005/eflow#//FCMBlock"/>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.ERRCD_LWR_RNG" name="ERRCD_LWR_RNG" lowerBound="1" defaultValueLiteral="5000">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.ERRCD_UPR_RNG" name="ERRCD_UPR_RNG" lowerBound="1" defaultValueLiteral="5999">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <eStructuralFeatures xmi:type="ecore:EAttribute" xmi:id="Property.ERRCD_LIST" name="ERRCD_LIST" lowerBound="1" defaultValueLiteral="3602">
+      <eType xmi:type="ecore:EDataType" href="http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    </eStructuralFeatures>
+    <translation xmi:type="utility:TranslatableString" key="CatchHandler_SF" bundleName="com/banksohar/esb/lib/CatchHandler_SF" pluginId="ESBLib"/>
+    <colorGraphic16 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/ESBLib/icons/full/obj16/CatchHandler_SF.gif"/>
+    <colorGraphic32 xmi:type="utility:GIFFileGraphic" resourceName="platform:/plugin/ESBLib/icons/full/obj30/CatchHandler_SF.gif"/>
+    <composition>
+      <nodes xmi:type="eflow:FCMSource" xmi:id="InTerminal.Input" location="61,118">
+        <translation xmi:type="utility:TranslatableString" key="InTerminal.Input" bundleName="com/banksohar/esb/lib/CatchHandler_SF" pluginId="ESBLib"/>
+      </nodes>
+      <nodes xmi:type="eflow:FCMSink" xmi:id="OutTerminal.Output" location="377,118">
+        <translation xmi:type="utility:TranslatableString" key="OutTerminal.Output" bundleName="com/banksohar/esb/lib/CatchHandler_SF" pluginId="ESBLib"/>
+      </nodes>
+      <nodes xmi:type="ComIbmCompute.msgnode:FCMComposite_1" xmi:id="FCMComposite_1_1" location="196,117" computeExpression="esql://routine/com.banksohar.esb.lib#CatchHandler_SF_PopulateEnvironment.Main">
+        <translation xmi:type="utility:ConstantString" string="CatchHandler_SF_Compute"/>
+      </nodes>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_1" targetNode="FCMComposite_1_1" sourceNode="InTerminal.Input" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+      <connections xmi:type="eflow:FCMConnection" xmi:id="FCMConnection_2" targetNode="OutTerminal.Output" sourceNode="FCMComposite_1_1" sourceTerminalName="OutTerminal.out" targetTerminalName="InTerminal.in"/>
+    </composition>
+    <propertyOrganizer>
+      <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.ERRCD_LWR_RNG">
+        <propertyName xmi:type="utility:TranslatableString" key="Property.ERRCD_LWR_RNG" bundleName="com/banksohar/esb/lib/CatchHandler_SF" pluginId="ESBLib"/>
+        <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.ERRCD_UPR_RNG">
+          <propertyName xmi:type="utility:TranslatableString" key="Property.ERRCD_UPR_RNG" bundleName="com/banksohar/esb/lib/CatchHandler_SF" pluginId="ESBLib"/>
+          <propertyDescriptor groupName="Group.Basic" configurable="true" userDefined="true" describedAttribute="Property.ERRCD_LIST">
+            <propertyName xmi:type="utility:TranslatableString" key="Property.ERRCD_LIST" bundleName="com/banksohar/esb/lib/CatchHandler_SF" pluginId="ESBLib"/>
+          </propertyDescriptor>
+        </propertyDescriptor>
+      </propertyDescriptor>
+    </propertyOrganizer>
+    <stickyBoard/>
+  </eClassifiers>
+</ecore:EPackage>

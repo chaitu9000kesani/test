@@ -1,0 +1,71 @@
+BROKER SCHEMA com.banksohar.esb.lib
+
+
+
+CREATE PROCEDURE NativeExceptionFilter(IN InputExceptionList REFERENCE, OUT NativeErrorCode CHARACTER, OUT NativeErrorMessage CHARACTER, OUT NativeErrorDescription CHARACTER) BEGIN
+	DECLARE ParentError CHARACTER '';
+	DECLARE ErrorCode CHARACTER '';
+	DECLARE ErrorText CHARACTER '';
+	DECLARE ErrorTextChr CHARACTER '';
+	DECLARE ErrorLabel CHARACTER;
+	DECLARE SCursor REFERENCE TO InputExceptionList.[1];
+	DECLARE V1 CHARACTER '';
+	SET V1 = FIELDNAME(SCursor);
+	DECLARE ParentErrorText CHARACTER '';
+	DECLARE ErrorType CHARACTER;
+	DECLARE Count INTEGER;
+	DECLARE ParentLabel CHARACTER;
+	SET ParentLabel = InputExceptionList.RecoverableException.Label;
+	WHILE LASTMOVE(SCursor) DO
+		SET ErrorText = FIELDNAME(SCursor);
+		MOVE SCursor NEXTSIBLING;
+		IF ErrorText IS NOT NULL THEN
+			DECLARE I INTEGER 1;
+			DECLARE Count INTEGER;
+			IF (ErrorText = 'DatabaseException') OR (ErrorText = 'SocketException') OR (ErrorText = 'SocketTimeoutException') OR (ErrorText = 'SecurityException') OR (ErrorText = 'ConfigurationException') OR (ErrorText = 'ConversionException') OR (ErrorText = 'UserException') or (ErrorText = 'ParserException') or (ErrorText = 'FatalException') OR (ErrorText = 'RecoverableException')
+				OR (ErrorText = 'CastException') OR (ErrorText = 'MessageException') OR (ErrorText = 'SqlException') OR (ErrorText = 'UnknownException') THEN
+				SET ErrorLabel = SCursor.Label;
+				SET NativeErrorCode = SCursor.Number;
+				SET ErrorType = ErrorText;
+				SET ParentErrorText = SCursor.Text;
+				SET ParentError = SCursor.Text;
+				SET Count = CARDINALITY(SCursor.[]) - 10 ;
+
+				IF (ErrorText IS NOT NULL) AND
+					(ErrorText = 'UserException') OR (ErrorText = 'ParserException') OR (ErrorText = 'FatalException') OR (ErrorText = 'RecoverableException') OR (ErrorText = 'CastException') OR (ErrorText = 'MessageException') OR (ErrorText = 'SqlException') OR (ErrorText = 'UnknownException') OR
+					(ErrorText = 'DatabaseException') OR (ErrorText = 'SocketException') OR (ErrorText = 'SocketTimeoutException') OR (ErrorText = 'SecurityException') OR (ErrorText = 'ConfigurationException') OR (ErrorText = 'ConversionException') AND
+					(EXISTS(SCursor.Insert[])) THEN
+					SET ErrorTextChr = '';
+					SET NativeErrorCode = SCursor.Number;
+					WHILE ( Count >= I) DO
+						IF (FIELDVALUE(SCursor.Insert[I].Text) IS NOT NULL) AND
+							(FIELDVALUE(SCursor.Insert[I].Type) = 5) THEN
+							SET ErrorTextChr = ErrorTextChr || FIELDVALUE(SCursor.Insert[I].Text)||'_';
+						END IF;
+						SET I =I+1;
+					END WHILE;
+				END IF;
+
+				IF (ErrorText IS NOT NULL) AND
+					(ErrorText = 'FatalException') THEN
+					SET ErrorTextChr = ParentError;
+				END IF;
+			
+			END IF;
+			MOVE SCursor LASTCHILD;
+		END IF;
+	END WHILE;
+	
+	IF ErrorLabel = '' THEN
+		SET ErrorLabel = ParentLabel;
+		--SET ErrorTextChr = COALESCE (SCursor.Insert[3].Text,ParentErrorText);
+	END IF;
+	IF ErrorTextChr = '' THEN
+		SET ErrorTextChr = ParentError;
+	END IF;
+
+	DECLARE Msg BLOB '';
+	SET Msg = ASBITSTREAM(InputExceptionList CCSID 437 Encoding 546);
+	SET NativeErrorMessage = CAST(Msg as char CCSID 437);
+	SET NativeErrorDescription = ParentErrorText || '::' || ErrorTextChr;
+	END;

@@ -1,0 +1,72 @@
+BROKER SCHEMA com.banksohar.esb.lib
+DECLARE AUDITLOG_FLAG EXTERNAL BOOLEAN FALSE;
+
+CREATE COMPUTE MODULE GenerateAuditLogMsg_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		 --CALL CopyMessageHeaders();
+		 --CALL CopyEntireMessage();
+		IF AUDITLOG_FLAG IS FALSE THEN
+			-- End processing if the AUDITLOG_FLAG is FALSE
+			RETURN FALSE;
+			
+		ELSE
+			 --OperationName
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.OperationName			=	Environment.Variables.AuditLog.OperationName;
+			 --UniqueMessageIdentifier
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.UniqueMessageIdentifier=	Environment.Variables.AuditLog.UniqueMsgIdentifier;
+			 --Transaction DateTime
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.TxnDateTime			=	CURRENT_TIMESTAMP;
+			 --Message Flow Name
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.MessageFlowName		=	SQL.MessageFlowLabel;
+			 --BrokerName
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.BROKERNAME				=	BrokerName;
+			 --Execution Group Name
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.EXECUTIONGROUPNAME		=	ExecutionGroupLabel;----The label of the execution group (a human-readable name)
+			 --LogPoint
+			 SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.LogPoint				=	Environment.Variables.AuditLog.LogPoint;
+			 --Message Payload
+			 
+			 --SET OutputRoot.Properties.CodedCharSetId	=	1208;
+			 --SET OutputRoot.Properties.ContentType		=	'UTF-8';
+			 --ATM DFDL
+			 --SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.MessagePayload		=InputRoot.*[<];
+			
+			SET OutputRoot.Properties.CodedCharSetId =      1208;
+            SET OutputRoot.Properties.ContentType          =      'UTF-8';
+            --SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.MessagePayload           =InputRoot.*[<];
+           
+            IF CONTAINS(SQL.MessageFlowLabel,'ATM') AND CONTAINS(Environment.Variables.AuditLog.LogPoint,'ESB Sent Request to Finacle') THEN
+
+                    DECLARE myMsgBlob BLOB;
+                    DECLARE myMsgChar CHARACTER;
+
+                    SET myMsgBlob = ASBITSTREAM(InputRoot.DFDL.*[<] CCSID 1208 Encoding 273);
+                    SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.MessagePayload = myMsgBlob;
+                           
+                           
+           ELSE
+                           
+               
+                    SET OutputRoot.XMLNSC.IIBLogEvent.AuditLogEvent.MessagePayload             =      InputRoot.*[<];
+				
+           END IF;
+                
+          END IF;
+	
+	END;
+	
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+	END;
+
+	CREATE PROCEDURE CopyEntireMessage() BEGIN
+		SET OutputRoot = InputRoot;
+	END;
+END MODULE;
