@@ -9,8 +9,11 @@ CREATE FILTER MODULE mpClear_JMS_SF_Filter
 			
 			
 			
+			
+			
 		RETURN TRUE;
 	END;
+
 
 END MODULE;
 
