@@ -8,6 +8,8 @@ CREATE COMPUTE MODULE Fetch_MSGID_REG
 		-- CALL CopyEntireMessage();
 		--test sample--
 		--again test sample--
+		
+		-- once again--
 		RETURN TRUE;
 	END;
 
